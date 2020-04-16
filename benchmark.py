@@ -76,7 +76,7 @@ def main():
     items = [int(x.strip()) for x in args.items.split(',')]
     print('***** Benchmark Results *****')
     for item_count in items:
-        print(f'{item_count} Items per proto:')
+        print(f'\n{item_count} Items per proto:')
         baseline = CppAddressBook()
         for _ in range(item_count):
             new_person = baseline.people.add()
@@ -92,7 +92,7 @@ def main():
         cython_address_book = CyAddressBook()
         cpp_address_book = CppAddressBook()
 
-        print('\n\t*** Compute ***')
+        print('\t*** Compute ***')
         cpp_timeit_result = run_timeit(lambda: cpp_address_book.ParseFromString(baseline_proto))
         print(f'\tBaseline ParseFromString:\t{cpp_timeit_result:.2f}ns')
         cython_timeit_result = run_timeit(lambda: cython_address_book.ParseFromString(baseline_proto))
@@ -120,7 +120,7 @@ def main():
         percentage_drop = ((cpp_allocated_memory - cython_allocated_memory) / cpp_allocated_memory) * 100
         drop_label = 'Decrease'
         if percentage_drop < 0:
-            percentage_drop = abs(percentage_drop) - 100
+            percentage_drop = abs(percentage_drop)
             drop_label = 'Increase'
 
         print('\n\t*** Memory ***')
