@@ -1,0 +1,3 @@
+cython
+protobuf
+memory_profiler
