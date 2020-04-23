@@ -3,6 +3,7 @@
 from libcpp.string cimport string
 
 from common cimport MessageDifferencer as CppMessageDifferencer
+from common cimport MessageToJsonString
 from common cimport Message as CppMessage
 from pb.people.models.people_pb_externs cimport Person as CppPerson
 from pb.people.models.people_pb_externs cimport Person_PhoneNumber as CppPerson_PhoneNumber
@@ -25,6 +26,11 @@ cdef class _CythonMessage:
     def SerializeToString(self):
         cdef string result = string()
         self._internal.SerializeToString(&result)
+        return result
+
+    def to_json(self):
+        cdef string result = string()
+        MessageToJsonString(self._internal[0], &result)
         return result
 
     def ParseFromString(self, data):

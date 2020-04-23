@@ -1,5 +1,6 @@
 import argparse
 import gc
+import json
 import linecache
 import os
 import random
@@ -7,6 +8,8 @@ import resource
 import string
 import sys
 from timeit import Timer
+
+from google.protobuf import json_format
 
 from memory_profiler import LineProfiler
 
@@ -91,20 +94,32 @@ def main():
 
         cython_address_book = CyAddressBook()
         cpp_address_book = CppAddressBook()
+        cpp_address_book.ParseFromString(baseline_proto)
+        cython_address_book.ParseFromString(baseline_proto)
+        json_str = json_format.MessageToJson(cpp_address_book)
+        py_dict = json.loads(json_str)
 
         print('\t*** Compute ***')
+        json_timeit_result = run_timeit(lambda: json.loads(json_str))
+        print(f'\tjson.loads:                \t{json_timeit_result:.2f}ns')
         cpp_timeit_result = run_timeit(lambda: cpp_address_book.ParseFromString(baseline_proto))
-        print(f'\tBaseline ParseFromString:\t{cpp_timeit_result:.2f}ns')
+        print(f'\tBaseline ParseFromString:  \t{cpp_timeit_result:.2f}ns')
         cython_timeit_result = run_timeit(lambda: cython_address_book.ParseFromString(baseline_proto))
-        print(f'\tCython   ParseFromString:\t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
+        print(f'\tCython   ParseFromString:  \t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
+        json_timeit_result = run_timeit(lambda: json.dumps(py_dict))
+        print(f'\tjson.dumps:                \t{json_timeit_result:.2f}ns')
         cpp_timeit_result = run_timeit(lambda: cpp_address_book.SerializeToString())
         print(f'\tBaseline SerializeToString:\t{cpp_timeit_result:.2f}ns')
         cython_timeit_result = run_timeit(lambda: cython_address_book.SerializeToString())
         print(f'\tCython   SerializeToString:\t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
+        cpp_timeit_result = run_timeit(lambda: json_format.MessageToJson(cpp_address_book))
+        print(f'\tBaseline MessageToJson:    \t{cpp_timeit_result:.2f}ns')
+        cython_timeit_result = run_timeit(lambda: cython_address_book.to_json())
+        print(f'\tCython   MessageToJson:    \t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
         cpp_timeit_result = run_timeit(lambda: list(cpp_address_book.people))
-        print(f'\tBaseline Iterate:\t{cpp_timeit_result:.2f}ns')
+        print(f'\tBaseline Iterate:          \t{cpp_timeit_result:.2f}ns')
         cython_timeit_result = run_timeit(lambda: list(cython_address_book.people))
-        print(f'\tCython   Iterate:\t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
+        print(f'\tCython   Iterate:          \t{cython_timeit_result:.2f}ns ({cpp_timeit_result / cython_timeit_result:.2f} X Speedup)')
         cpp_person = list(cpp_address_book.people)[0]
         cython_person = list(cython_address_book.people)[0]
         cpp_timeit_result = run_timeit(lambda: cpp_person.name)

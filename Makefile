@@ -6,11 +6,11 @@ benchmark: install
 
 cc:
 	mkdir -p cc
-	protoc -I. --python_out=py --cpp_out=cc $(proto_files)
+	protoc -I. --cpp_out=cc $(proto_files)
 
 py:
 	mkdir -p py
-	protoc -I. --python_out=py --python_out=py $(proto_files)
+	protoc -I. --python_out=py $(proto_files)
 
 venv:
 	python3 -m virtualenv venv
