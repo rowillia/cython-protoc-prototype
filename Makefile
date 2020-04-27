@@ -15,6 +15,6 @@ py:
 venv:
 	python3 -m virtualenv venv
 
-install: venv cc py requirements.txt cy/addressbook.pyx
+install: venv cc py requirements.txt
 	./venv/bin/pip install -r requirements.txt
 	cd cy && ../venv/bin/python setup.py install

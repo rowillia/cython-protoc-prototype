@@ -1,7 +1,8 @@
 # distutils: language = c++
+# distutils: sources = ../cc/pb/people/models/people.pb.cc
 
 from libcpp.string cimport string
-from common cimport Message
+from cytobuf.protobuf.common cimport Message
 
 cdef extern from "pb/people/models/people.pb.h" namespace "pb::people::models":
     cdef enum Person_PhoneType:

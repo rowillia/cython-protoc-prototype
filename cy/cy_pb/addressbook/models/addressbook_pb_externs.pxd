@@ -1,8 +1,8 @@
 # distutils: language = c++
 
 from libcpp.string cimport string
-from pb.people.models.people_pb_externs cimport Person
-from common cimport Message
+from cytobuf.protobuf.common cimport Message
+from cy_pb.people.models.people_pb_externs cimport Person
 
 cdef extern from "pb/addressbook/models/addressbook.pb.h" namespace "pb::addressbook::models":
     cdef cppclass AddressBook(Message):
